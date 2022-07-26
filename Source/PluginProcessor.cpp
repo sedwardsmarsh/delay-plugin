@@ -158,6 +158,16 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
         // ..do something to the data...
     }
+    
+    
+    // 1. check to see if main buffer copies to delay buffer without needing to wrap...
+        // if yes
+            // copy main buffer contents to delay buffer
+        // if no (modulus)
+            // Determine how much space is left at the end of the delay buffer
+            // Copy that amount of content to the end
+            // calculate how much contents is remaining to copy
+            // copy remaining amount to beginning of delay buffer
 }
 
 //==============================================================================
