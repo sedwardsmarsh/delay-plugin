@@ -95,6 +95,8 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    auto delayBufferSize = sampleRate * 2.0; // 2 seconds of audio @ 44.1kHz is 88200 samples
+    delayBuffer.setSize(getTotalNumOutputChannels(), (int)delayBufferSize);
 }
 
 void NewProjectAudioProcessor::releaseResources()
