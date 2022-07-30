@@ -159,31 +159,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     {
         auto* channelData = buffer.getWritePointer (channel);
 
-        float startGain = 0.1f;
-        float endGain = 0.1f;
-        
-        // Check to see if main buffer copies to delay buffer without needing to wrap...
-        if (delayBufferSize > bufferSize + writePosition) {
-            
-            // copy main buffer samples to delay buffer
-            delayBuffer.copyFromWithRamp(channel, writePosition, channelData, bufferSize, startGain, endGain);
-        }
-        
-        // Needs to wrap
-        else
-        {
-            // Determine how much space is left at the end of the delay buffer
-            auto numSamplesToEnd = delayBufferSize - writePosition;
-            
-            // Copy that amount of samples to the end
-            delayBuffer.copyFromWithRamp(channel, writePosition, channelData, numSamplesToEnd, startGain, endGain);
-            
-            // calculate how many samples are remaining to copy
-            auto numSamplesAtStart = bufferSize - numSamplesToEnd;
-            
-            // copy remaining amount to beginning of delay buffer, from the start
-            delayBuffer.copyFromWithRamp(channel, 0, channelData + numSamplesToEnd, numSamplesAtStart, startGain, endGain);
-        }
+        fillBuffer (channel, bufferSize, delayBufferSize, channelData);
     }
     
     // Juce debug logger
@@ -192,6 +168,35 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     DBG("Write Position: " << writePosition);
     
     writePosition = (writePosition + bufferSize) % delayBufferSize;
+}
+
+void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int delayBufferSize, float* channelData)
+{
+    float startGain = 0.1f;
+    float endGain = 0.1f;
+    
+    // Check to see if main buffer copies to delay buffer without needing to wrap...
+    if (delayBufferSize > bufferSize + writePosition) {
+        
+        // copy main buffer samples to delay buffer
+        delayBuffer.copyFromWithRamp(channel, writePosition, channelData, bufferSize, startGain, endGain);
+    }
+    
+    // Needs to wrap
+    else
+    {
+        // Determine how much space is left at the end of the delay buffer
+        auto numSamplesToEnd = delayBufferSize - writePosition;
+        
+        // Copy that amount of samples to the end
+        delayBuffer.copyFromWithRamp(channel, writePosition, channelData, numSamplesToEnd, startGain, endGain);
+        
+        // calculate how many samples are remaining to copy
+        auto numSamplesAtStart = bufferSize - numSamplesToEnd;
+        
+        // copy remaining amount to beginning of delay buffer, from the start
+        delayBuffer.copyFromWithRamp(channel, 0, channelData + numSamplesToEnd, numSamplesAtStart, startGain, endGain);
+    }
 }
 
 //==============================================================================
