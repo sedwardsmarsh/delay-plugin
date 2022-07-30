@@ -158,14 +158,24 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-
         fillBuffer (channel, bufferSize, delayBufferSize, channelData);
+        
+        // 1 second of audio from the past (in the delay buffer)
+        int readPosition = writePosition - getSampleRate();
+        
+        if (readPosition < 0)
+            readPosition += delayBufferSize;
+        
+//        if (readPosition + bufferSize < delayBufferSize)
+//        {
+//            // add contents from read
+//        }
     }
     
     // Juce debug logger
-    DBG("Delay Buffer Size: " << delayBufferSize);
-    DBG("Buffer Size: " << bufferSize);
-    DBG("Write Position: " << writePosition);
+//    DBG("Delay Buffer Size: " << delayBufferSize);
+//    DBG("Buffer Size: " << bufferSize);
+//    DBG("Write Position: " << writePosition);
     
     writePosition = (writePosition + bufferSize) % delayBufferSize;
 }
