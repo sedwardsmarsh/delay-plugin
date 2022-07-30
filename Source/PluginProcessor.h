@@ -58,10 +58,10 @@ public:
 
 private:
     void fillBuffer (int channel, int bufferSize, int delayBufferSize, float* channelData);
+    void readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, int bufferSize, int delayBufferSize);
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
     int writePosition {0}; // write position in the circular buffer
-    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessor)
 };
