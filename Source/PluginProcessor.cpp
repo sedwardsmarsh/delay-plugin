@@ -181,9 +181,14 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             auto numSamplesAtStart = bufferSize - numSamplesToEnd;
             
             // copy remaining amount to beginning of delay buffer, from the start
-            delayBuffer.copyFromWithRamp(channel, 0, channelData, numSamplesAtStart, startGain, endGain);
+            delayBuffer.copyFromWithRamp(channel, 0, channelData + numSamplesToEnd, numSamplesAtStart, startGain, endGain);
         }
     }
+    
+    // Juce debug logger
+    DBG("Delay Buffer Size: " << delayBufferSize);
+    DBG("Buffer Size: " << bufferSize);
+    DBG("Write Position: " << writePosition);
     
     writePosition = (writePosition + bufferSize) % delayBufferSize;
 }
