@@ -170,7 +170,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         }
         
         // Needs to wrap
-        else {
+        else
+        {
             // Determine how much space is left at the end of the delay buffer
             auto numSamplesToEnd = delayBufferSize - writePosition;
             
