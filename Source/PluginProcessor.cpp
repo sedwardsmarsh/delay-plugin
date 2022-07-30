@@ -137,47 +137,27 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
     auto bufferSize = buffer.getNumSamples();
     auto delayBufferSize = delayBuffer.getNumSamples();
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
         fillBuffer (channel, bufferSize, delayBufferSize, channelData);
-        
-        // 1 second of audio from the past (in the delay buffer)
-        int readPosition = writePosition - getSampleRate();
-        
-        if (readPosition < 0)
-            readPosition += delayBufferSize;
-        
-//        if (readPosition + bufferSize < delayBufferSize)
-//        {
-//            // add contents from read
-//        }
+        readFromBuffer(buffer, delayBuffer, channel, bufferSize, delayBufferSize);
     }
-    
+
     // Juce debug logger
 //    DBG("Delay Buffer Size: " << delayBufferSize);
 //    DBG("Buffer Size: " << bufferSize);
 //    DBG("Write Position: " << writePosition);
-    
-    writePosition = (writePosition + bufferSize) % delayBufferSize;
+
+//    writePosition = (writePosition + bufferSize) % delayBufferSize;
+    writePosition += bufferSize;
+    writePosition %= delayBufferSize;
 }
 
 void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int delayBufferSize, float* channelData)
@@ -189,7 +169,7 @@ void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int dela
     if (delayBufferSize > bufferSize + writePosition) {
         
         // copy main buffer samples to delay buffer
-        delayBuffer.copyFromWithRamp(channel, writePosition, channelData, bufferSize, startGain, endGain);
+        delayBuffer.copyFromWithRamp (channel, writePosition, channelData, bufferSize, startGain, endGain);
     }
     
     // Needs to wrap
@@ -199,13 +179,38 @@ void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int dela
         auto numSamplesToEnd = delayBufferSize - writePosition;
         
         // Copy that amount of samples to the end
-        delayBuffer.copyFromWithRamp(channel, writePosition, channelData, numSamplesToEnd, startGain, endGain);
+        delayBuffer.copyFromWithRamp (channel, writePosition, channelData, numSamplesToEnd, startGain, endGain);
         
         // calculate how many samples are remaining to copy
         auto numSamplesAtStart = bufferSize - numSamplesToEnd;
         
         // copy remaining amount to beginning of delay buffer, from the start
-        delayBuffer.copyFromWithRamp(channel, 0, channelData + numSamplesToEnd, numSamplesAtStart, startGain, endGain);
+        delayBuffer.copyFromWithRamp (channel, 0, channelData + numSamplesToEnd, numSamplesAtStart, startGain, endGain);
+    }
+}
+
+void NewProjectAudioProcessor::readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, int bufferSize, int delayBufferSize)
+{
+    // 1 second of audio from the past (in the delay buffer)
+    auto readPosition = writePosition - getSampleRate();
+    
+    // what if readPosition is negative? Should we increment until becoming positive?
+    if (readPosition < 0)
+        readPosition += delayBufferSize;
+
+    if (readPosition + bufferSize < delayBufferSize)
+    {
+        // add bufferSize number of samples starting at readPosition from the delayBuffer to the main buffer
+        // using addWithRamp so that the delay effect is more apparent (because the volume is lower)
+        buffer.addFromWithRamp (channel, 0, delayBuffer.getReadPointer (channel, readPosition), bufferSize, 0.7f, 0.7f);
+    }
+    else
+    {
+        int numSamplesToEnd = delayBufferSize - readPosition;
+        buffer.addFromWithRamp (channel, 0, delayBuffer.getReadPointer (channel, readPosition), numSamplesToEnd, 0.7f, 0.7f);
+
+        int numSamplesAtStart = bufferSize - numSamplesToEnd;
+        buffer.addFromWithRamp (channel, numSamplesToEnd, delayBuffer.getReadPointer (channel, 0), numSamplesAtStart, 0.7f, 0.7f);
     }
 }
 
