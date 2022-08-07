@@ -95,6 +95,7 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+//    std::cout << "Sample Rate = " << getSampleRate() << std::endl << "times two = " << getSampleRate() * 2 << std::endl;
     auto delayBufferSize = sampleRate * 2.0; // 2 seconds of audio @ 44.1kHz is 88200 samples
     delayBuffer.setSize(getTotalNumOutputChannels(), (int)delayBufferSize);
 }
@@ -146,8 +147,15 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
+        
+        // Copy input signal into delay buffer, from the main buffer
         fillBuffer (channel, bufferSize, delayBufferSize, channelData);
-        readFromBuffer(buffer, delayBuffer, channel, bufferSize, delayBufferSize);
+        
+        // Copy delayed signal into main buffer, from the delay buffer
+        readFromBuffer (buffer, delayBuffer, channel, bufferSize, delayBufferSize);
+        
+        // Copy input signal into delay buffer, from the main buffer
+//        fillBuffer (channel, bufferSize, delayBufferSize, channelData);
     }
 
     // Juce debug logger
@@ -162,14 +170,11 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
 void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int delayBufferSize, float* channelData)
 {
-    float startGain = 0.1f;
-    float endGain = 0.1f;
-    
     // Check to see if main buffer copies to delay buffer without needing to wrap...
     if (delayBufferSize > bufferSize + writePosition) {
         
         // copy main buffer samples to delay buffer
-        delayBuffer.copyFromWithRamp (channel, writePosition, channelData, bufferSize, startGain, endGain);
+        delayBuffer.copyFrom (channel, writePosition, channelData, bufferSize);
     }
     
     // Needs to wrap
@@ -179,13 +184,13 @@ void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int dela
         auto numSamplesToEnd = delayBufferSize - writePosition;
         
         // Copy that amount of samples to the end
-        delayBuffer.copyFromWithRamp (channel, writePosition, channelData, numSamplesToEnd, startGain, endGain);
+        delayBuffer.copyFrom (channel, writePosition, channelData, numSamplesToEnd);
         
         // calculate how many samples are remaining to copy
         auto numSamplesAtStart = bufferSize - numSamplesToEnd;
         
         // copy remaining amount to beginning of delay buffer, from the start
-        delayBuffer.copyFromWithRamp (channel, 0, channelData + numSamplesToEnd, numSamplesAtStart, startGain, endGain);
+        delayBuffer.copyFrom (channel, 0, channelData + numSamplesToEnd, numSamplesAtStart);
     }
 }
 
@@ -197,20 +202,21 @@ void NewProjectAudioProcessor::readFromBuffer (juce::AudioBuffer<float>& buffer,
     // what if readPosition is negative? Should we increment until becoming positive?
     if (readPosition < 0)
         readPosition += delayBufferSize;
+    
+    auto volume = 0.7f;
 
     if (readPosition + bufferSize < delayBufferSize)
     {
         // add bufferSize number of samples starting at readPosition from the delayBuffer to the main buffer
-        // using addWithRamp so that the delay effect is more apparent (because the volume is lower)
-        buffer.addFromWithRamp (channel, 0, delayBuffer.getReadPointer (channel, readPosition), bufferSize, 0.7f, 0.7f);
+        buffer.addFrom (channel, 0, delayBuffer.getReadPointer (channel, readPosition), bufferSize, volume);
     }
     else
     {
         int numSamplesToEnd = delayBufferSize - readPosition;
-        buffer.addFromWithRamp (channel, 0, delayBuffer.getReadPointer (channel, readPosition), numSamplesToEnd, 0.7f, 0.7f);
+        buffer.addFrom (channel, 0, delayBuffer.getReadPointer (channel, readPosition), numSamplesToEnd, volume);
 
         int numSamplesAtStart = bufferSize - numSamplesToEnd;
-        buffer.addFromWithRamp (channel, numSamplesToEnd, delayBuffer.getReadPointer (channel, 0), numSamplesAtStart, 0.7f, 0.7f);
+        buffer.addFrom (channel, numSamplesToEnd, delayBuffer.getReadPointer (channel, 0), numSamplesAtStart, volume);
     }
 }
 
