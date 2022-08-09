@@ -155,7 +155,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         readFromBuffer (buffer, delayBuffer, channel, bufferSize, delayBufferSize);
         
         // Copy input signal into delay buffer, from the main buffer
-//        fillBuffer (channel, bufferSize, delayBufferSize, channelData);
+        fillBuffer (channel, bufferSize, delayBufferSize, channelData);
     }
 
     // Juce debug logger
