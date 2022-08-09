@@ -59,6 +59,7 @@ public:
 private:
     void fillBuffer (juce::AudioBuffer<float>& buffer, int channel);
     void readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel);
+    void updateBufferPositions (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer);
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
     int writePosition {0}; // write position in the circular buffer

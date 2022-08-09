@@ -148,11 +148,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         fillBuffer (buffer, channel);
     }
     
-    auto bufferSize = buffer.getNumSamples();
-    auto delayBufferSize = delayBuffer.getNumSamples();
-
-    writePosition += bufferSize;
-    writePosition %= delayBufferSize;
+    updateBufferPositions (buffer, delayBuffer);
 }
 
 void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int channel)
@@ -209,6 +205,15 @@ void NewProjectAudioProcessor::readFromBuffer (juce::AudioBuffer<float>& buffer,
         int numSamplesAtStart = bufferSize - numSamplesToEnd;
         buffer.addFrom (channel, numSamplesToEnd, delayBuffer.getReadPointer (channel, 0), numSamplesAtStart, volume);
     }
+}
+
+void NewProjectAudioProcessor::updateBufferPositions (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer)
+{
+    auto bufferSize = buffer.getNumSamples();
+    auto delayBufferSize = delayBuffer.getNumSamples();
+
+    writePosition += bufferSize;
+    writePosition %= delayBufferSize;
 }
 
 //==============================================================================
