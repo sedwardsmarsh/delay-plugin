@@ -148,13 +148,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     {
         auto* channelData = buffer.getWritePointer (channel);
         
-        // Copy input signal into delay buffer, from the main buffer
         fillBuffer (channel, bufferSize, delayBufferSize, channelData);
-        
-        // Copy delayed signal into main buffer, from the delay buffer
         readFromBuffer (buffer, delayBuffer, channel, bufferSize, delayBufferSize);
-        
-        // Copy input signal into delay buffer, from the main buffer
         fillBuffer (channel, bufferSize, delayBufferSize, channelData);
     }
 
