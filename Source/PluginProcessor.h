@@ -57,7 +57,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
-    void fillBuffer (int channel, int bufferSize, int delayBufferSize, float* channelData);
+    void fillBuffer (juce::AudioBuffer<float>& buffer, int channel, int bufferSize, int delayBufferSize);
     void readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, int bufferSize, int delayBufferSize);
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer

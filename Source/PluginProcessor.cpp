@@ -146,11 +146,9 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-        
-        fillBuffer (channel, bufferSize, delayBufferSize, channelData);
+        fillBuffer (buffer, channel, bufferSize, delayBufferSize);
         readFromBuffer (buffer, delayBuffer, channel, bufferSize, delayBufferSize);
-        fillBuffer (channel, bufferSize, delayBufferSize, channelData);
+        fillBuffer (buffer, channel, bufferSize, delayBufferSize);
     }
 
     // Juce debug logger
@@ -163,8 +161,10 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     writePosition %= delayBufferSize;
 }
 
-void NewProjectAudioProcessor::fillBuffer (int channel, int bufferSize, int delayBufferSize, float* channelData)
+void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int channel, int bufferSize, int delayBufferSize)
 {
+    auto* channelData = buffer.getWritePointer (channel);
+    
     // Check to see if main buffer copies to delay buffer without needing to wrap...
     if (delayBufferSize > bufferSize + writePosition) {
         
