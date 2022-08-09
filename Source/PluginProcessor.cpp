@@ -163,13 +163,11 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
 void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int channel, int bufferSize, int delayBufferSize)
 {
-    auto* channelData = buffer.getWritePointer (channel);
-    
     // Check to see if main buffer copies to delay buffer without needing to wrap...
     if (delayBufferSize > bufferSize + writePosition) {
         
         // copy main buffer samples to delay buffer
-        delayBuffer.copyFrom (channel, writePosition, channelData, bufferSize);
+        delayBuffer.copyFrom (channel, writePosition, buffer.getWritePointer (channel), bufferSize);
     }
     
     // Needs to wrap
@@ -177,15 +175,13 @@ void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int
     {
         // Determine how much space is left at the end of the delay buffer
         auto numSamplesToEnd = delayBufferSize - writePosition;
-        
         // Copy that amount of samples to the end
-        delayBuffer.copyFrom (channel, writePosition, channelData, numSamplesToEnd);
+        delayBuffer.copyFrom (channel, writePosition, buffer.getWritePointer (channel), numSamplesToEnd);
         
         // calculate how many samples are remaining to copy
         auto numSamplesAtStart = bufferSize - numSamplesToEnd;
-        
         // copy remaining amount to beginning of delay buffer, from the start
-        delayBuffer.copyFrom (channel, 0, channelData + numSamplesToEnd, numSamplesAtStart);
+        delayBuffer.copyFrom (channel, 0, buffer.getWritePointer (channel) + numSamplesToEnd, numSamplesAtStart);
     }
 }
 
