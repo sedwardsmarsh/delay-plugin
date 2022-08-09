@@ -181,7 +181,7 @@ void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int
         // calculate how many samples are remaining to copy
         auto numSamplesAtStart = bufferSize - numSamplesToEnd;
         // copy remaining amount to beginning of delay buffer, from the start
-        delayBuffer.copyFrom (channel, 0, buffer.getWritePointer (channel) + numSamplesToEnd, numSamplesAtStart);
+        delayBuffer.copyFrom (channel, 0, buffer.getWritePointer (channel, numSamplesToEnd), numSamplesAtStart);
     }
 }
 
