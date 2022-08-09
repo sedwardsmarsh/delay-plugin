@@ -140,29 +140,26 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        fillBuffer (buffer, channel);
+        readFromBuffer (buffer, delayBuffer, channel);
+        fillBuffer (buffer, channel);
+    }
     
     auto bufferSize = buffer.getNumSamples();
     auto delayBufferSize = delayBuffer.getNumSamples();
 
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        fillBuffer (buffer, channel, bufferSize, delayBufferSize);
-        readFromBuffer (buffer, delayBuffer, channel, bufferSize, delayBufferSize);
-        fillBuffer (buffer, channel, bufferSize, delayBufferSize);
-    }
-
-    // Juce debug logger
-//    DBG("Delay Buffer Size: " << delayBufferSize);
-//    DBG("Buffer Size: " << bufferSize);
-//    DBG("Write Position: " << writePosition);
-
-//    writePosition = (writePosition + bufferSize) % delayBufferSize;
     writePosition += bufferSize;
     writePosition %= delayBufferSize;
 }
 
-void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int channel, int bufferSize, int delayBufferSize)
+void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int channel)
 {
+    auto bufferSize = buffer.getNumSamples();
+    auto delayBufferSize = delayBuffer.getNumSamples();
+    
     // Check to see if main buffer copies to delay buffer without needing to wrap...
     if (delayBufferSize > bufferSize + writePosition) {
         
@@ -185,8 +182,11 @@ void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int
     }
 }
 
-void NewProjectAudioProcessor::readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, int bufferSize, int delayBufferSize)
+void NewProjectAudioProcessor::readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel)
 {
+    auto bufferSize = buffer.getNumSamples();
+    auto delayBufferSize = delayBuffer.getNumSamples();
+    
     // 1 second of audio from the past (in the delay buffer)
     auto readPosition = writePosition - getSampleRate();
     
