@@ -247,3 +247,17 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new NewProjectAudioProcessor();
 }
+
+//==============================================================================
+juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::createParameters()
+{
+    // vector that contains parameter layout information
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    
+    // Allocate memory for the unique pointers.
+    // We're allocating pointers of type juce::AudioParameterFloat because AudioParameterFloat inherits from type juce::RangedAudioParameter
+    params.push_back (std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", 0.0f, 1.0f, 0.5f));
+    
+    // the return type is a vector
+    return { params.begin(), params.end() };
+}
