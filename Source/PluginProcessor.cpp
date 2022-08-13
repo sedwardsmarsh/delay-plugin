@@ -19,6 +19,10 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
+                       // *this -> audio processor we want to connect to, just use the current instance.
+                       // nullptr -> we're not supplying an undo manager.
+                       // "Parameters" -> name of the value tree.
+                       // createParamters() -> returns our parameterLayout object.
                        ), apvts (*this, nullptr, "Parameters", createParameters())
 #endif
 {
