@@ -141,6 +141,11 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
+    // get the value from the gain slider
+    auto g = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
+    // need to dereference and call load() to access the value
+    std::cout << g->load() << std::endl;
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
