@@ -14,6 +14,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     // setup the gain slider
+    // we don't need to specify parameter limits (max and min) because those are specified in the PluginProcessor.cpp
     gainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
     addAndMakeVisible (gainSlider); // make this slider a child component of the main component
