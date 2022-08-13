@@ -55,6 +55,9 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    //==============================================================================
+    juce::AudioProcessorValueTreeState apvts; // contains the parameters of the plugin
 
 private:
     void fillBuffer (juce::AudioBuffer<float>& buffer, int channel);
@@ -63,6 +66,9 @@ private:
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
     int writePosition {0}; // write position in the circular buffer
+    
+    // function for returning the parameter layout
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessor)
 };
