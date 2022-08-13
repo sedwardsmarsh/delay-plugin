@@ -19,6 +19,12 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
     addAndMakeVisible (gainSlider); // make this slider a child component of the main component
     
+    // instantiate the gain slider attachment unique pointer
+    // audioProcessor.apvts -> accessing the apvts from the audioProcessor that created this class instance
+    // "GAIN" -> parameter ID, specified in PluginProcessor.cpp
+    // gainSlider -> slider object
+    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "GAIN", gainSlider);
+    
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
