@@ -155,6 +155,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         fillBuffer (buffer, channel);
         readFromBuffer (buffer, delayBuffer, channel);
         fillBuffer (buffer, channel);
+        
+        // adjust the gain of the samples in each channel
     }
     
     updateBufferPositions (buffer, delayBuffer);
@@ -265,6 +267,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     
     // Allocate memory for the unique pointers.
     // We're allocating pointers of type juce::AudioParameterFloat because AudioParameterFloat inherits from type juce::RangedAudioParameter
+    // TODO: Set parameter version hints: only for Logic and Garageband
     params.push_back (std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", 0.0f, 1.0f, 0.5f));
     
     // the return type is a vector
