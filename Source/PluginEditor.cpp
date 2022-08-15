@@ -16,7 +16,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     // setup the gain slider
     // we don't need to specify parameter limits (max and min) because those are specified in the PluginProcessor.cpp
     gainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    gainSlider.setTextBoxStyle (juce::Slider::TextBoxAbove, true, 100, 50);
+    gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
     addAndMakeVisible (gainSlider); // make this slider a child component of the main component
     
     // instantiate the gain slider attachment unique pointer
@@ -24,6 +24,12 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     // "GAIN" -> parameter ID, specified in PluginProcessor.cpp
     // gainSlider -> slider object
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "GAIN", gainSlider);
+    
+    // instantiate wet gain slider
+    wetGainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    wetGainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
+    addAndMakeVisible (wetGainSlider);
+    wetGainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WET_GAIN", wetGainSlider);
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -49,5 +55,6 @@ void NewProjectAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    gainSlider.setBounds (getWidth()/2 - 100, getHeight()/2 - 50, 200, 100);
+    gainSlider.setBounds (getWidth()/4 - 100, getHeight()/2 - 50, 200, 100);
+    wetGainSlider.setBounds (getWidth() * 3/4 - 100, getHeight()/2 - 50, 200, 100);
 }
