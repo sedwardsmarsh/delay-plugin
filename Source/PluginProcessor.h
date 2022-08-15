@@ -60,8 +60,8 @@ public:
     juce::AudioProcessorValueTreeState apvts; // contains the parameters of the plugin
 
 private:
-    void fillBuffer (juce::AudioBuffer<float>& buffer, int channel);
-    void readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel);
+    void fillDelayBuffer (juce::AudioBuffer<float>& buffer, int channel);
+    void readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel);
     void updateBufferPositions (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer);
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer

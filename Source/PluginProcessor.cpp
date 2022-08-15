@@ -152,9 +152,9 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        fillBuffer (buffer, channel);
-        readFromBuffer (buffer, delayBuffer, channel);
-        fillBuffer (buffer, channel);
+        fillDelayBuffer (buffer, channel);
+        readDelayBuffer (buffer, delayBuffer, channel);
+        fillDelayBuffer (buffer, channel);
         
         // adjust the gain of the samples in each channel
         buffer.applyGain(gain);
@@ -163,7 +163,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     updateBufferPositions (buffer, delayBuffer);
 }
 
-void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int channel)
+void NewProjectAudioProcessor::fillDelayBuffer (juce::AudioBuffer<float>& buffer, int channel)
 {
     auto bufferSize = buffer.getNumSamples();
     auto delayBufferSize = delayBuffer.getNumSamples();
@@ -190,7 +190,7 @@ void NewProjectAudioProcessor::fillBuffer (juce::AudioBuffer<float>& buffer, int
     }
 }
 
-void NewProjectAudioProcessor::readFromBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel)
+void NewProjectAudioProcessor::readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel)
 {
     auto bufferSize = buffer.getNumSamples();
     auto delayBufferSize = delayBuffer.getNumSamples();
