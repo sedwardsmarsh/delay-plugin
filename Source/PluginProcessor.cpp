@@ -145,16 +145,21 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
+    // TODO: modularize getting parameter values into a function that returns a dictionary of values or something
+    
     // get the value from the main gain slider
     auto main_gain_ptr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
     // need to dereference and call load() to access the value
     auto main_gain = main_gain_ptr->load();
     
+    // wet gain
+    auto wet_gain_ptr = apvts.getRawParameterValue ("WET_GAIN");
+    auto wet_gain = wet_gain_ptr->load();
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         fillDelayBuffer (buffer, channel);
-        readDelayBuffer (buffer, delayBuffer, channel);
+        readDelayBuffer (buffer, delayBuffer, channel, wet_gain);
         fillDelayBuffer (buffer, channel);
         
         // adjust the gain of the samples in each channel
@@ -191,7 +196,7 @@ void NewProjectAudioProcessor::fillDelayBuffer (juce::AudioBuffer<float>& buffer
     }
 }
 
-void NewProjectAudioProcessor::readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel)
+void NewProjectAudioProcessor::readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain)
 {
     auto bufferSize = buffer.getNumSamples();
     auto delayBufferSize = delayBuffer.getNumSamples();
