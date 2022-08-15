@@ -206,21 +206,19 @@ void NewProjectAudioProcessor::readDelayBuffer (juce::AudioBuffer<float>& buffer
     // what if readPosition is negative? Should we increment until becoming positive?
     if (readPosition < 0)
         readPosition += delayBufferSize;
-    
-    auto volume = 1.0f;
 
     if (readPosition + bufferSize < delayBufferSize)
     {
         // add bufferSize number of samples starting at readPosition from the delayBuffer to the main buffer
-        buffer.addFrom (channel, 0, delayBuffer.getReadPointer (channel, readPosition), bufferSize, volume);
+        buffer.addFrom (channel, 0, delayBuffer.getReadPointer (channel, readPosition), bufferSize, wetGain);
     }
     else
     {
         int numSamplesToEnd = delayBufferSize - readPosition;
-        buffer.addFrom (channel, 0, delayBuffer.getReadPointer (channel, readPosition), numSamplesToEnd, volume);
+        buffer.addFrom (channel, 0, delayBuffer.getReadPointer (channel, readPosition), numSamplesToEnd, wetGain);
 
         int numSamplesAtStart = bufferSize - numSamplesToEnd;
-        buffer.addFrom (channel, numSamplesToEnd, delayBuffer.getReadPointer (channel, 0), numSamplesAtStart, volume);
+        buffer.addFrom (channel, numSamplesToEnd, delayBuffer.getReadPointer (channel, 0), numSamplesAtStart, wetGain);
     }
 }
 
