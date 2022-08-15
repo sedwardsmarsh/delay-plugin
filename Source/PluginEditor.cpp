@@ -13,7 +13,7 @@
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // setup the gain slider
+    // setup the main gain slider
     // we don't need to specify parameter limits (max and min) because those are specified in the PluginProcessor.cpp
     gainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
@@ -25,11 +25,23 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     // gainSlider -> slider object
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "GAIN", gainSlider);
     
+    // setup the main gain label
+    gainLabel.setText("main gain", juce::dontSendNotification);
+    gainLabel.setJustificationType(juce::Justification::centred);
+    gainLabel.attachToComponent(&gainSlider, false);
+    addAndMakeVisible(gainLabel);
+    
     // instantiate wet gain slider
     wetGainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     wetGainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
     addAndMakeVisible (wetGainSlider);
     wetGainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WET_GAIN", wetGainSlider);
+    
+    // setup the wet gain label
+    wetGainLabel.setText("wet gain", juce::dontSendNotification);
+    wetGainLabel.setJustificationType(juce::Justification::centred);
+    wetGainLabel.attachToComponent(&wetGainSlider, false);
+    addAndMakeVisible(wetGainLabel);
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -55,6 +67,6 @@ void NewProjectAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    gainSlider.setBounds (getWidth()/4 - 100, getHeight()/2 - 50, 200, 100);
-    wetGainSlider.setBounds (getWidth() * 3/4 - 100, getHeight()/2 - 50, 200, 100);
+    gainSlider.setBounds (getWidth() * 3/4 - 100, getHeight()/2 - 50, 200, 100);
+    wetGainSlider.setBounds (getWidth() * 1/4 - 100, getHeight()/2 - 50, 200, 100);
 }
