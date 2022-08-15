@@ -145,10 +145,11 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
-    // get the value from the gain slider
-    auto g = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
+    // get the value from the main gain slider
+    auto main_gain_ptr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
     // need to dereference and call load() to access the value
-    auto gain = g->load();
+    auto main_gain = main_gain_ptr->load();
+    
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -157,7 +158,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         fillDelayBuffer (buffer, channel);
         
         // adjust the gain of the samples in each channel
-        buffer.applyGain(gain);
+        buffer.applyGain(main_gain);
     }
     
     updateBufferPositions (buffer, delayBuffer);
