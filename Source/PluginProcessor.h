@@ -71,7 +71,7 @@ private:
     // parameter functions and members
     // function for returning the parameter layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
-    std::tuple <float, float> getParameters()
+    std::tuple <float, float> getParameters();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessor)
 };
