@@ -61,7 +61,7 @@ public:
 
 private:
     void fillDelayBuffer (juce::AudioBuffer<float>& buffer, int channel);
-    void readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel);
+    void readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain);
     void updateBufferPositions (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer);
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
