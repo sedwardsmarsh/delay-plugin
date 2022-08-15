@@ -26,7 +26,9 @@ public:
 
 private:
     juce::Slider gainSlider;
+    juce::Label gainLabel;
     juce::Slider wetGainSlider;
+    juce::Label wetGainLabel;
     
     // Need to create a slider attachment between our gain slider and the gain parameter.
     // Our slider attachment must be destroyed before the slider object is destroyed:
