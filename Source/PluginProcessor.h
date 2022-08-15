@@ -60,6 +60,7 @@ public:
     juce::AudioProcessorValueTreeState apvts; // contains the parameters of the plugin
 
 private:
+    // dsp functions and members
     void fillDelayBuffer (juce::AudioBuffer<float>& buffer, int channel);
     void readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain);
     void updateBufferPositions (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer);
@@ -67,8 +68,10 @@ private:
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
     int writePosition {0}; // write position in the circular buffer
     
+    // parameter functions and members
     // function for returning the parameter layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
+    std::tuple <float, float> getParameters()
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessor)
 };
