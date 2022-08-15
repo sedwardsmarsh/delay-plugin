@@ -266,11 +266,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     // vector that contains parameter layout information
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     
-    // Allocate memory for the unique pointers.
+    // Allocate memory for the unique pointers of each parameter.
     // We're allocating pointers of type juce::AudioParameterFloat because AudioParameterFloat inherits from type juce::RangedAudioParameter
     // TODO: Set parameter version hints: only for Logic and Garageband
+    
+    // main gain
     auto gainParameterID = juce::ParameterID { "GAIN", 1 };
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(gainParameterID, "Gain", 0.0f, 1.0f, 0.5f));
+    params.push_back (std::make_unique<juce::AudioParameterFloat>(gainParameterID, "Gain", 0.0f, 1.0f, 1.0f));
+    
+    // wet gain
+    auto wetGainParameterID = juce::ParameterID { "WET_GAIN", 1 };
+    params.push_back (std::make_unique<juce::AudioParameterFloat>(wetGainParameterID, "Wet_Gain", 0.0f, 1.0f, 0.5f));
     
     // the return type is a vector
     return { params.begin(), params.end() };
