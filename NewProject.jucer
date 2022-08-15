@@ -2,7 +2,8 @@
 
 <JUCERPROJECT id="Z3KOVt" name="Circular Buffer" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              companyName="crazydog audio">
+              companyName="crazydog audio" pluginName="Circular Buffer" pluginFormats="buildAU,buildStandalone,buildVST3"
+              pluginVST3Category="Delay">
   <MAINGROUP id="kEQKwr" name="Circular Buffer">
     <GROUP id="{3E4F5128-02C7-991D-5711-4D92B02D9688}" name="Source">
       <FILE id="XKv6Ab" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -18,8 +19,8 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="NewProject"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="NewProject"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Circular Buffer"/>
+        <CONFIGURATION isDebug="1" name="Release" targetName="NewProject"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../../../../Applications/JUCE/modules"/>
