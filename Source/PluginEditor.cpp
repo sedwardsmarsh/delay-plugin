@@ -43,6 +43,10 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     wetGainLabel.attachToComponent(&wetGainSlider, false);
     addAndMakeVisible(wetGainLabel);
     
+    // setup the buffer clear button
+    clearBufferButton.setButtonText("clear buffer");
+    addAndMakeVisible(clearBufferButton);
+    
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
@@ -68,5 +72,6 @@ void NewProjectAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     gainSlider.setBounds (getWidth() * 3/4 - 100, getHeight()/2 - 50, 200, 100);
-    wetGainSlider.setBounds (getWidth() * 1/4 - 100, getHeight()/2 - 50, 200, 100);
+    wetGainSlider.setBounds (getWidth() * 1/4 - 100, getHeight()/2 - 75, 200, 100);
+    clearBufferButton.setBounds(getWidth() * 1/4 - 50, getHeight()/2 + 25, 100, 100);
 }
