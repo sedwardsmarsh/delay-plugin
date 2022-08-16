@@ -145,16 +145,10 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
-    // TODO: modularize getting parameter values into a function that returns a dictionary of values or something
-    
-    // get the value from the main gain slider
-    auto mainGainPtr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
-    // need to dereference and call load() to access the value
-    auto mainGain = mainGainPtr->load();
-    
-    // wet gain
-    auto wetGainPtr = apvts.getRawParameterValue ("WET_GAIN");
-    auto wetGain = wetGainPtr->load();
+    // get interface parameter values
+    float mainGain;
+    float wetGain;
+    std::tie(mainGain, wetGain) = getParameters();
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -283,4 +277,18 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     
     // the return type is a vector
     return { params.begin(), params.end() };
+}
+
+std::tuple <float, float> NewProjectAudioProcessor::getParameters()
+{
+    // get the value from the main gain slider
+    auto mainGainPtr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
+    // need to dereference and call load() to access the value
+    auto mainGain = mainGainPtr->load();
+    
+    // wet gain
+    auto wetGainPtr = apvts.getRawParameterValue ("WET_GAIN");
+    auto wetGain = wetGainPtr->load();
+    
+    return std::make_tuple(mainGain, wetGain);
 }
