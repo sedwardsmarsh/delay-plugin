@@ -149,14 +149,14 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     float mainGain;
     float wetGain;
     std::tie(mainGain, wetGain) = getParameters();
+    
+    buffer.applyGain(mainGain);
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         fillDelayBuffer (buffer, channel);
         readDelayBuffer (buffer, delayBuffer, channel, wetGain);
         fillDelayBuffer (buffer, channel);
-        
-        buffer.applyGain(mainGain);
     }
     
     updateBufferPositions (buffer, delayBuffer);
