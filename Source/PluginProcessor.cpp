@@ -142,21 +142,31 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
+    // clear both channels
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
     // get interface parameter values
     float mainGain;
     float wetGain;
-    std::tie(mainGain, wetGain) = getParameters();
+    bool clearBuffer;
+    std::tie(mainGain, wetGain, clearBuffer) = getParameters();
     
-    buffer.applyGain(mainGain);
+    // clear delay
+    if (clearBuffer == true) {
+        buffer.clear();
+        delayBuffer.clear();
+        clearBufferFlag = false;
+    }
 
+    // calculate delay
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         fillDelayBuffer (buffer, channel);
         readDelayBuffer (buffer, delayBuffer, channel, wetGain);
         fillDelayBuffer (buffer, channel);
+        
+        buffer.applyGain(mainGain);
     }
     
     updateBufferPositions (buffer, delayBuffer);
@@ -269,26 +279,29 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     
     // main gain
     auto gainParameterID = juce::ParameterID { "GAIN", 1 };
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(gainParameterID, "Gain", 0.0f, 1.0f, 1.0f));
+    params.push_back (std::make_unique<juce::AudioParameterFloat> (gainParameterID, "Gain", 0.0f, 1.0f, 1.0f));
     
     // wet gain
     auto wetGainParameterID = juce::ParameterID { "WET_GAIN", 1 };
-    params.push_back (std::make_unique<juce::AudioParameterFloat>(wetGainParameterID, "Wet_Gain", 0.0f, 1.0f, 0.5f));
+    params.push_back (std::make_unique<juce::AudioParameterFloat> (wetGainParameterID, "Wet_Gain", 0.0f, 1.0f, 0.5f));
     
     // the return type is a vector
     return { params.begin(), params.end() };
 }
 
-std::tuple <float, float> NewProjectAudioProcessor::getParameters()
+std::tuple <float, float, bool> NewProjectAudioProcessor::getParameters()
 {
     // get the value from the main gain slider
     auto mainGainPtr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
     // need to dereference and call load() to access the value
-    auto mainGain = mainGainPtr->load();
+    float mainGain = mainGainPtr->load();
     
     // wet gain
     auto wetGainPtr = apvts.getRawParameterValue ("WET_GAIN");
-    auto wetGain = wetGainPtr->load();
+    float wetGain = wetGainPtr->load();
     
-    return std::make_tuple(mainGain, wetGain);
+    // clear buffer (even though its technically not a parameter)
+    bool clearBuffer = this->clearBufferFlag;
+    
+    return std::make_tuple(mainGain, wetGain, clearBuffer);
 }
