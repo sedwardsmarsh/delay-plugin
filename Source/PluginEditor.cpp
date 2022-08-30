@@ -23,7 +23,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     // audioProcessor.apvts -> accessing the apvts from the audioProcessor that created this class instance
     // "GAIN" -> parameter ID, specified in PluginProcessor.cpp
     // gainSlider -> slider object
-    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "GAIN", gainSlider);
+    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (audioProcessor.apvts, "GAIN", gainSlider);
     
     // setup the main gain label
     gainLabel.setText("main gain", juce::dontSendNotification);
@@ -35,7 +35,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     wetGainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
     wetGainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
     addAndMakeVisible (wetGainSlider);
-    wetGainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WET_GAIN", wetGainSlider);
+    wetGainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (audioProcessor.apvts, "WET_GAIN", wetGainSlider);
     
     // setup the wet gain label
     wetGainLabel.setText("wet gain", juce::dontSendNotification);
@@ -45,6 +45,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     
     // setup the buffer clear button
     clearBufferButton.setButtonText("clear buffer");
+    clearBufferButton.onClick = [this]() { audioProcessor.clearBufferFlag = true; };
     addAndMakeVisible(clearBufferButton);
     
     // Make sure that before the constructor has finished, you've set the
