@@ -26,10 +26,10 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (audioProcessor.apvts, "GAIN", gainSlider);
     
     // setup the main gain label
-    gainLabel.setText("main gain", juce::dontSendNotification);
-    gainLabel.setJustificationType(juce::Justification::centred);
-    gainLabel.attachToComponent(&gainSlider, false);
-    addAndMakeVisible(gainLabel);
+    gainLabel.setText ("main gain", juce::dontSendNotification);
+    gainLabel.setJustificationType (juce::Justification::centred);
+    gainLabel.attachToComponent (&gainSlider, false);
+    addAndMakeVisible (gainLabel);
     
     // instantiate wet gain slider
     wetGainSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
@@ -38,15 +38,27 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor (NewProjectAudioP
     wetGainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (audioProcessor.apvts, "WET_GAIN", wetGainSlider);
     
     // setup the wet gain label
-    wetGainLabel.setText("wet gain", juce::dontSendNotification);
-    wetGainLabel.setJustificationType(juce::Justification::centred);
-    wetGainLabel.attachToComponent(&wetGainSlider, false);
-    addAndMakeVisible(wetGainLabel);
+    wetGainLabel.setText ("wet gain", juce::dontSendNotification);
+    wetGainLabel.setJustificationType (juce::Justification::centred);
+    wetGainLabel.attachToComponent (&wetGainSlider, false);
+    addAndMakeVisible (wetGainLabel);
     
     // setup the buffer clear button
-    clearBufferButton.setButtonText("clear buffer");
+    clearBufferButton.setButtonText ("clear buffer");
     clearBufferButton.onClick = [this]() { audioProcessor.clearBufferFlag = true; };
-    addAndMakeVisible(clearBufferButton);
+    addAndMakeVisible (clearBufferButton);
+    
+    // instantiate delay length slider
+    delayLengthSlider.setSliderStyle (juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    delayLengthSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 100, 50);
+    addAndMakeVisible (delayLengthSlider);
+    delayLengthSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (audioProcessor.apvts, "DELAY_LENGTH", delayLengthSlider);
+    
+    // setup the delay length label
+    delayLengthLabel.setText ("delay length", juce::dontSendNotification);
+    delayLengthLabel.setJustificationType (juce::Justification::centred);
+    delayLengthLabel.attachToComponent (&delayLengthSlider, false);
+    addAndMakeVisible (delayLengthLabel);
     
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -72,7 +84,8 @@ void NewProjectAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    gainSlider.setBounds (getWidth() * 3/4 - 100, getHeight()/2 - 50, 200, 100);
-    wetGainSlider.setBounds (getWidth() * 1/4 - 100, getHeight()/2 - 75, 200, 100);
-    clearBufferButton.setBounds(getWidth() * 1/4 - 50, getHeight()/2 + 25, 100, 100);
+    gainSlider.setBounds (getWidth() * 3/4 - 100, getHeight()/2 - 100, 200, 100);
+    wetGainSlider.setBounds (getWidth() * 3/4 - 100, getHeight  ()/2 + 25, 200, 100);
+    clearBufferButton.setBounds (getWidth() * 1/4 - 50, getHeight()/2 + 25, 100, 100); // TODO: make clear buffer button height smaller and don't warp text
+    delayLengthSlider.setBounds (getWidth() * 1/4 - 100, getHeight()/2 - 75, 200, 100);
 }
