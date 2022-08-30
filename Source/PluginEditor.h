@@ -36,8 +36,7 @@ private:
     // Classes in c++ are created from the top down, therefor we want to declare our slider attachment after our gainSlider.
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> wetGainSliderAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> clearBufferButtonAttachment;
-    
+
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     NewProjectAudioProcessor& audioProcessor;
