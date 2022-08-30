@@ -65,7 +65,7 @@ public:
 private:
     // dsp functions and members
     void fillDelayBuffer (juce::AudioBuffer<float>& buffer, int channel);
-    void readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain);
+    void readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain, int readPositionOffset);
     void updateBufferPositions (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer);
     
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
@@ -74,7 +74,7 @@ private:
     // parameter functions and members
     // function for returning the parameter layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
-    std::tuple <float, float, bool> getParameters();
+    std::tuple <float, float, bool, int> getParameters();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessor)
 };

@@ -150,7 +150,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     float mainGain;
     float wetGain;
     bool clearBuffer;
-    std::tie(mainGain, wetGain, clearBuffer) = getParameters();
+    int readPositionOffset;
+    std::tie(mainGain, wetGain, clearBuffer, readPositionOffset) = getParameters();
     
     // clear delay
     if (clearBuffer == true) {
@@ -163,7 +164,7 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         fillDelayBuffer (buffer, channel);
-        readDelayBuffer (buffer, delayBuffer, channel, wetGain);
+        readDelayBuffer (buffer, delayBuffer, channel, wetGain, readPositionOffset);
         fillDelayBuffer (buffer, channel);
         
         buffer.applyGain(mainGain);
@@ -199,13 +200,12 @@ void NewProjectAudioProcessor::fillDelayBuffer (juce::AudioBuffer<float>& buffer
     }
 }
 
-void NewProjectAudioProcessor::readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain)
+void NewProjectAudioProcessor::readDelayBuffer (juce::AudioBuffer<float>& buffer, juce::AudioBuffer<float>& delayBuffer, int channel, float wetGain, int readPositionOffset)
 {
     auto bufferSize = buffer.getNumSamples();
     auto delayBufferSize = delayBuffer.getNumSamples();
     
-    // 1 second of audio from the past (in the delay buffer)
-    auto readPosition = writePosition - getSampleRate();
+    auto readPosition = writePosition - readPositionOffset;
     
     // what if readPosition is negative? Should we increment until becoming positive?
     if (readPosition < 0)
@@ -285,11 +285,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     auto wetGainParameterID = juce::ParameterID { "WET_GAIN", 1 };
     params.push_back (std::make_unique<juce::AudioParameterFloat> (wetGainParameterID, "Wet_Gain", 0.0f, 1.0f, 0.5f));
     
+    // delay length
+    auto delayLengthParameterID = juce::ParameterID { "DELAY_LENGTH", 1 };
+//    int maxDelayLength = delayBuffer.getNumSamples();
+    int maxDelayLength = 88200 - 1;
+    params.push_back (std::make_unique<juce::AudioParameterInt> (delayLengthParameterID, "Delay_Length", 1, maxDelayLength, 44100));
+    
     // the return type is a vector
     return { params.begin(), params.end() };
 }
 
-std::tuple <float, float, bool> NewProjectAudioProcessor::getParameters()
+std::tuple <float, float, bool, int> NewProjectAudioProcessor::getParameters()
 {
     // get the value from the main gain slider
     auto mainGainPtr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
@@ -303,5 +309,9 @@ std::tuple <float, float, bool> NewProjectAudioProcessor::getParameters()
     // clear buffer (even though its technically not a parameter)
     bool clearBuffer = this->clearBufferFlag;
     
-    return std::make_tuple(mainGain, wetGain, clearBuffer);
+    // delay length
+    auto delayLengthPtr = apvts.getRawParameterValue ("DELAY_LENGTH");
+    int delayLength = delayLengthPtr->load();
+    
+    return std::make_tuple(mainGain, wetGain, clearBuffer, delayLength);
 }
