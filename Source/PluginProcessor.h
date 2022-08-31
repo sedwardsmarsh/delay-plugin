@@ -71,6 +71,8 @@ private:
     juce::AudioBuffer<float> delayBuffer; // this is the circular buffer
     int writePosition {0}; // write position in the circular buffer
     
+    int delayBufferLength {0};
+    
     // parameter functions and members
     // function for returning the parameter layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
