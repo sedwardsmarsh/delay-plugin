@@ -23,7 +23,7 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
                        // nullptr -> we're not supplying an undo manager.
                        // "Parameters" -> name of the value tree.
                        // createParamters() -> returns our parameterLayout object.
-                       ), apvts (*this, nullptr, "Parameters", createParameters())
+                       ), apvts (*this, nullptr, "Parameters", createParameters()) // TODO: this is called too soon (before member delayBufferMaxTime is initialized, so the delay length parameter has zero as its max and min values). This should scale with samplerate, why can't this use the sampleRate from prepareToPlay()?
 #endif
 {
 }
@@ -99,9 +99,12 @@ void NewProjectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-//    std::cout << "Sample Rate = " << getSampleRate() << std::endl << "times two = " << getSampleRate() * 2 << std::endl;
-    auto delayBufferSize = sampleRate * 2.0; // 2 seconds of audio @ 44.1kHz is 88200 samples
-    delayBuffer.setSize(getTotalNumOutputChannels(), (int)delayBufferSize);
+    
+    savedSampleRate = sampleRate;
+    delayBufferLength = (int)(sampleRate * delayBufferMaxTime);
+    delayBuffer.setSize(getTotalNumOutputChannels(), delayBufferLength);
+    
+    std::cout << "savedSampleRate=" << savedSampleRate << std::endl << "delayBufferLength=" << delayBufferLength << std::endl << "delayBuffer.getNumSamples()=" << delayBuffer.getNumSamples() << std::endl;
 }
 
 void NewProjectAudioProcessor::releaseResources()
@@ -150,8 +153,8 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     float mainGain;
     float wetGain;
     bool clearBuffer;
-    int readPositionOffset;
-    std::tie(mainGain, wetGain, clearBuffer, readPositionOffset) = getParameters();
+    float delayTime;
+    std::tie(mainGain, wetGain, clearBuffer, delayTime) = getParameters();
     
     // clear delay
     if (clearBuffer == true) {
@@ -159,6 +162,9 @@ void NewProjectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         delayBuffer.clear();
         clearBufferFlag = false;
     }
+    
+    // convert delayTime from seconds into samples to get read head position
+    int readPositionOffset = (int)(delayTime * savedSampleRate);
 
     // calculate delay
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -287,15 +293,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout NewProjectAudioProcessor::cr
     
     // delay length
     auto delayLengthParameterID = juce::ParameterID { "DELAY_LENGTH", 1 };
-//    int maxDelayLength = delayBuffer.getNumSamples();
-    int maxDelayLength = 88200 - 1;
-    params.push_back (std::make_unique<juce::AudioParameterInt> (delayLengthParameterID, "Delay_Length", 1, maxDelayLength, 44100));
+    params.push_back (std::make_unique<juce::AudioParameterFloat> (delayLengthParameterID, "Delay_Length", 0.0f,  3.99f, 2.0f)); // TODO: initialize delay length parameter with delayBufferMaxTime parameter, instead of hardcoding it.
+    
+//    std::cout << "delayBufferMaxTime=" << delayBufferMaxTime << std::endl;
     
     // the return type is a vector
     return { params.begin(), params.end() };
 }
 
-std::tuple <float, float, bool, int> NewProjectAudioProcessor::getParameters()
+std::tuple <float, float, bool, float> NewProjectAudioProcessor::getParameters()
 {
     // get the value from the main gain slider
     auto mainGainPtr = apvts.getRawParameterValue ("GAIN"); // returns a std::atomic<float>* wtf is that?
@@ -311,7 +317,7 @@ std::tuple <float, float, bool, int> NewProjectAudioProcessor::getParameters()
     
     // delay length
     auto delayLengthPtr = apvts.getRawParameterValue ("DELAY_LENGTH");
-    int delayLength = delayLengthPtr->load();
+    float delayLength = delayLengthPtr->load();
     
     return std::make_tuple(mainGain, wetGain, clearBuffer, delayLength);
 }

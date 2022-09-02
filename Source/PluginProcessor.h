@@ -72,11 +72,13 @@ private:
     int writePosition {0}; // write position in the circular buffer
     
     int delayBufferLength {0};
+    float delayBufferMaxTime {4.0f}; // x * sample_rate = x-second long buffer
+    double savedSampleRate {0.0};
     
     // parameter functions and members
     // function for returning the parameter layout
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
-    std::tuple <float, float, bool, int> getParameters();
+    std::tuple <float, float, bool, float> getParameters();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NewProjectAudioProcessor)
 };
